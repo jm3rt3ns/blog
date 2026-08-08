@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { sortedProjects } from '../../lib/collections';
+
+const projects = sortedProjects(await getCollection('projects'));
+---
+
+<BaseLayout
+  title="Work"
+  description="A short set of projects, each documented the way a drawing is documented — scope, stack, dates and what came of it."
+  wide
+>
+  <header class="border-b border-rule pb-5 max-w-measure">
+    <h1 class="text-2xl">Work</h1>
+    <p class="mt-3 text-graphite">
+      A deliberately short list. Each project opens with a titleblock: who it was for, what I
+      did, what it was built with, and what came of it.
+    </p>
+  </header>
+
+  <div class="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      projects.map((project, index) => (
+        <ProjectCard project={project} eager={index === 0} />
+      ))
+    }
+  </div>
+</BaseLayout>

@@ -1,0 +1,82 @@
+---
+/**
+ * The titleblock (build spec §6.3) — the site's signature element.
+ *
+ * A hairline-ruled grid of labeled fields, modeled on the titleblock of an
+ * engineering drawing. Project pages open with the full block drawn from the
+ * `projects` schema; post headers use a reduced version.
+ *
+ * Each cell draws its own right and bottom hairline, so adjacent cells share
+ * exactly one line and never double up. The grid is inset one pixel past the
+ * container on both trailing edges and clipped, which drops the outermost
+ * cell borders where the container's own border already draws the line. A
+ * partial last row is simply left empty — the rules stop where the fields do,
+ * the way they would on a drawing.
+ *
+ * Motion (§6.4): fields plot in on load with a 40ms stagger. This is the only
+ * orchestrated animation on the site, and `prefers-reduced-motion` renders it
+ * instantly rather than slowly.
+ */
+
+export interface Field {
+  label: string;
+  /** Values are pre-formatted by the caller; this component does no parsing. */
+  value: string;
+  /** Long values (stack lists, roles) take the full row. */
+  span?: boolean;
+  href?: string;
+}
+
+interface Props {
+  fields: Field[];
+  /** Rendered as a mark-colored stamp on the block's last row. */
+  status?: string;
+  /** A drawing revision note, e.g. "Rev. — 19 March 2026". */
+  revision?: string;
+  label?: string;
+  class?: string;
+}
+
+const { fields, status, revision, label = 'Details', class: className } = Astro.props;
+
+/** The stamp shares the stagger sequence, drawn last. */
+const stampIndex = fields.length;
+const cell = 'px-3 py-2.5 border-r border-b border-rule plot-in';
+---
+
+<section class:list={['border border-rule overflow-hidden', className]} aria-label={label}>
+  <div class="grid grid-cols-2 sm:grid-cols-4 -mr-px -mb-px">
+    {
+      fields.map((field, index) => (
+        <div
+          class:list={[cell, field.span && 'col-span-2 sm:col-span-4']}
+          style={`--plot-index:${index}`}
+        >
+          <div class="field-label">{field.label}</div>
+          <div class="mt-1 font-mono text-sm text-ink break-words">
+            {field.href ? <a href={field.href}>{field.value}</a> : field.value}
+          </div>
+        </div>
+      ))
+    }
+
+    {
+      (status || revision) && (
+        <div
+          class:list={[
+            cell,
+            'col-span-2 sm:col-span-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2',
+          ]}
+          style={`--plot-index:${stampIndex}`}
+        >
+          {status && (
+            <span class="inline-flex items-center border border-mark text-mark rounded-xs px-2 py-0.5 font-mono text-2xs font-medium uppercase tracking-[0.16em]">
+              {status}
+            </span>
+          )}
+          {revision && <span class="field-label">{revision}</span>}
+        </div>
+      )
+    }
+  </div>
+</section>

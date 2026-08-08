@@ -1,0 +1,127 @@
+---
+import '../styles/theme.css';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Overrides the derived canonical, for cross-posted pieces (§4.1). */
+  canonicalUrl?: string;
+  /** Wide pages (indexes) opt out of the 68ch prose cap. */
+  wide?: boolean;
+}
+
+const { title, description, canonicalUrl, wide = false } = Astro.props;
+
+const SITE_NAME = 'Jack Mertens';
+const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
+const pageTitle = title === SITE_NAME ? title : `${title} — ${SITE_NAME}`;
+
+const nav = [
+  { href: '/writing/', label: 'Writing' },
+  { href: '/work/', label: 'Work' },
+  { href: '/about/', label: 'About' },
+];
+
+/** A nav item is current for its own page and anything beneath it. */
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(href);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta name="theme-color" content="#EFEFE9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#12161B" media="(prefers-color-scheme: dark)" />
+
+    {/* Display face only (§6.2) — everything else swaps in. */}
+    <link
+      rel="preload"
+      href="/fonts/archivo-700-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    {/*
+      Theme resolution, inlined so it runs before first paint (§9).
+      No cookie means no explicit choice, and the CSS media query in
+      theme.css takes over — so this stays a no-op for most readers and
+      the page still themes correctly with JS disabled.
+    */}
+    <script is:inline>
+      (function () {
+        try {
+          var m = document.cookie.match(/(?:^|;\s*)theme=(dark|light)/);
+          if (m) document.documentElement.dataset.theme = m[1];
+        } catch (e) {
+          /* cookies blocked — fall through to prefers-color-scheme */
+        }
+      })();
+    </script>
+    <slot name="head" />
+  </head>
+
+  <body class="min-h-screen flex flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-vellum focus:text-ink focus:px-3 focus:py-2 focus:border focus:border-rule"
+    >
+      Skip to content
+    </a>
+
+    <header class="border-b border-rule">
+      <div
+        class="mx-auto max-w-page w-full px-5 sm:px-8 py-4 flex items-center justify-between gap-6"
+      >
+        <a
+          href="/"
+          class="font-display text-lg tracking-[-0.02em] text-ink no-underline hover:text-signal"
+        >
+          Jack Mertens
+        </a>
+
+        <nav aria-label="Primary" class="flex items-center gap-5">
+          {
+            nav.map((item) => (
+              <a
+                href={item.href}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                class:list={[
+                  'font-mono text-2xs uppercase tracking-[0.11em] no-underline',
+                  isCurrent(item.href)
+                    ? 'text-ink underline decoration-signal decoration-2 underline-offset-[6px]'
+                    : 'text-graphite hover:text-ink',
+                ]}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+          <ThemeToggle />
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="flex-1 w-full mx-auto max-w-page px-5 sm:px-8 py-10 sm:py-16">
+      <div class:list={[!wide && 'max-w-measure']}>
+        <slot />
+      </div>
+    </main>
+
+    <footer class="border-t border-rule mt-16">
+      <div
+        class="mx-auto max-w-page w-full px-5 sm:px-8 py-6 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 font-mono text-2xs uppercase tracking-[0.11em] text-graphite"
+      >
+        <span>Jack Mertens</span>
+        <span>jackmertens.com</span>
+      </div>
+    </footer>
+  </body>
+</html>

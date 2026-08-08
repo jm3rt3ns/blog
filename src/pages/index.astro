@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { featuredProjects, recentPosts } from '../lib/collections';
+
+const isDev = import.meta.env.DEV;
+const featured = featuredProjects(await getCollection('projects'));
+const recent = recentPosts(await getCollection('posts'), isDev);
+---
+
+<BaseLayout
+  title="Jack Mertens"
+  description="Jack Mertens builds software and writes about how the work actually goes — the specs, the trade-offs, and what shipping taught him."
+  wide
+>
+  <section class="max-w-measure">
+    <h1 class="text-3xl">Jack Mertens</h1>
+    <p class="mt-5 text-lg">
+      I build software, and I write about how the work actually goes — the specs, the
+      trade-offs, and what a thing taught me once it shipped.
+    </p>
+    <p class="mt-4 text-graphite">
+      Most of what is here falls into two piles: <a href="/writing/">writing</a>, which is
+      long-form and unhurried, and <a href="/work/">work</a>, which is a short set of projects
+      documented the way I'd document a drawing.
+    </p>
+  </section>
+
+  {
+    featured.length > 0 && (
+      <section class="mt-20" aria-labelledby="featured-work">
+        <div class="flex items-baseline justify-between border-b border-rule pb-3">
+          <h2 id="featured-work" class="field-label">
+            Selected work
+          </h2>
+          <a href="/work/" class="field-label hover:text-signal no-underline">
+            All work
+          </a>
+        </div>
+
+        <div class="mt-8 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((project, index) => (
+            <ProjectCard project={project} headingLevel={3} eager={index === 0} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    recent.length > 0 && (
+      <section class="mt-24 max-w-measure" aria-labelledby="recent-writing">
+        <div class="flex items-baseline justify-between border-b border-rule pb-3">
+          <h2 id="recent-writing" class="field-label">
+            Recent writing
+          </h2>
+          <a href="/writing/" class="field-label hover:text-signal no-underline">
+            All writing
+          </a>
+        </div>
+
+        <div class="mt-8 grid gap-8">
+          {recent.map((post) => (
+            <PostCard post={post} headingLevel={3} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {/*
+    Newsletter CTA mounts here in phase 5 (§8) — below the fold, one of only
+    two placements on the site. Nothing ships before then: the spec is
+    explicit that there is no placeholder and no dead form.
+  */}
+</BaseLayout>

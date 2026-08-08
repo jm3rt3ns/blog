@@ -1,0 +1,84 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import Titleblock from '../components/Titleblock.astro';
+import type { Post } from '../lib/collections';
+import { formatDate, hasRevision } from '../lib/format-date';
+import { readingTime } from '../lib/reading-time';
+import { tagLabel } from '../lib/tags';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, heroImage, canonicalUrl } = post.data;
+
+const { minutes } = readingTime(post.body ?? '');
+
+/** The reduced titleblock: two fields, plus a revision line when earned (§6.3). */
+const fields = [
+  { label: 'Published', value: formatDate(pubDate) },
+  { label: 'Reading time', value: `${minutes} min` },
+];
+
+const revision =
+  updatedDate && hasRevision(pubDate, updatedDate)
+    ? `Rev. — ${formatDate(updatedDate)}`
+    : undefined;
+---
+
+<BaseLayout title={title} description={description} canonicalUrl={canonicalUrl}>
+  <article>
+    <header>
+      <h1 class="text-2xl">{title}</h1>
+
+      <Titleblock fields={fields} revision={revision} label="Post details" class="mt-6" />
+
+      {
+        heroImage && (
+          <Image
+            src={heroImage}
+            alt=""
+            widths={[600, 900, 1400]}
+            sizes="(min-width: 768px) 68ch, 100vw"
+            loading="eager"
+            fetchpriority="high"
+            decoding="sync"
+            class="mt-8 w-full border border-rule rounded-xs"
+          />
+        )
+      }
+    </header>
+
+    <div class="prose mt-10">
+      <slot />
+    </div>
+
+    <footer class="mt-14 pt-5 border-t border-rule">
+      {
+        tags.length > 0 && (
+          <ul class="flex flex-wrap gap-x-4 gap-y-1 list-none p-0">
+            {tags.map((tag) => (
+              <li>
+                <a href={`/writing/tags/${tag}/`} class="field-label hover:text-signal no-underline">
+                  {tagLabel(tag)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      <p class="mt-6">
+        <a href="/writing/" class="font-mono text-sm">← All writing</a>
+      </p>
+
+      {/*
+        Comments mount here in phase 4 (§7): a single <Comments /> wrapper,
+        gated on this post's `comments` frontmatter flag. Nothing is rendered
+        until then — the spec is explicit that no placeholder ships early.
+      */}
+    </footer>
+  </article>
+</BaseLayout>

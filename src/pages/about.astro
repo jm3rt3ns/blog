@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="Who Jack Mertens is, what he builds, and the best way to get in touch about working together."
+>
+  <header class="border-b border-rule pb-5">
+    <h1 class="text-2xl">About</h1>
+  </header>
+
+  <div class="prose mt-10">
+    <p>
+      I'm Jack Mertens. I build software, and I care more about the parts that don't demo well
+      — the spec written before the first commit, the test that pins down the behavior, the
+      handoff that leaves someone else able to maintain the thing.
+    </p>
+
+    <h2>What I do</h2>
+    <p>
+      Design and build web applications end to end, from the data model through to the
+      deployment. I work spec-first: the document comes before the code, and it is the thing we
+      argue about while arguing is still cheap.
+    </p>
+
+    <h2>How I work</h2>
+    <p>
+      Test-driven where tests earn their keep. Small, reviewable changes. Plain infrastructure
+      over clever infrastructure. If a dependency has to be added, it has to be justified.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      The fastest way to reach me is email. See <a href="/work/">work</a> for what I've built,
+      and <a href="/writing/">writing</a> for how I think about building it.
+    </p>
+  </div>
+
+  {/*
+    TODO(phase 1 content): replace the placeholder bio above and add a real
+    contact address before this page goes to production. The structure is
+    right; the words are scaffolding.
+  */}
+</BaseLayout>

@@ -1,0 +1,75 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import Titleblock from '../components/Titleblock.astro';
+import type { Field } from '../components/Titleblock.astro';
+import type { Project } from '../lib/collections';
+import { formatDateRange } from '../lib/format-date';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { title, client, summary, role, stack, startDate, endDate, status, liveUrl, repoUrl, cover, outcomes } =
+  project.data;
+
+/**
+ * The full titleblock (§6.3) — a literal reading of the schema. Optional
+ * fields are dropped rather than rendered empty, so a personal project's
+ * block is shorter, not blank.
+ */
+const fields: Field[] = [
+  ...(client ? [{ label: 'Client', value: client }] : []),
+  { label: 'Duration', value: formatDateRange(startDate, endDate) },
+  { label: 'Role', value: role, span: !client },
+  { label: 'Stack', value: stack.join(' · '), span: true },
+  ...(liveUrl ? [{ label: 'Live', value: new URL(liveUrl).host, href: liveUrl }] : []),
+  ...(repoUrl ? [{ label: 'Source', value: new URL(repoUrl).host, href: repoUrl }] : []),
+];
+---
+
+<BaseLayout title={title} description={summary} wide>
+  <article>
+    <header class="max-w-measure">
+      <h1 class="text-2xl">{title}</h1>
+      <p class="mt-3 text-lg text-graphite">{summary}</p>
+    </header>
+
+    <Titleblock fields={fields} status={status} label="Project details" class="mt-8" />
+
+    <Image
+      src={cover}
+      alt=""
+      widths={[600, 1000, 1600]}
+      sizes="(min-width: 1024px) 72rem, 100vw"
+      loading="eager"
+      fetchpriority="high"
+      decoding="sync"
+      class="mt-8 w-full border border-rule rounded-xs"
+    />
+
+    {
+      outcomes && outcomes.length > 0 && (
+        <section class="mt-10 max-w-measure" aria-labelledby="outcomes">
+          <h2 id="outcomes" class="field-label">
+            Outcomes
+          </h2>
+          <ul class="mt-3 list-none p-0 border-t border-rule">
+            {outcomes.map((outcome) => (
+              <li class="border-b border-rule py-3">{outcome}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <div class="prose mt-10">
+      <slot />
+    </div>
+
+    <footer class="mt-14 pt-5 border-t border-rule max-w-measure">
+      <a href="/work/" class="font-mono text-sm">← All work</a>
+    </footer>
+  </article>
+</BaseLayout>

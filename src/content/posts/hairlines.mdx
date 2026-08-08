@@ -1,0 +1,35 @@
+---
+title: 'Notes on hairlines'
+description: 'An unfinished draft, kept in the repository to prove that drafts render in development and never reach a production build.'
+pubDate: 2026-04-01
+tags:
+  - Design
+  - CSS
+draft: true
+comments: false
+---
+
+import Titleblock from '../../components/Titleblock.astro';
+
+This post is a draft. It renders in `pnpm dev` and is excluded from
+`pnpm build`, which is the behavior the unit tests assert.
+
+It is also an `.mdx` file rather than `.md`, so it doubles as the proof that
+MDX compiles and that a post can import a component when it needs one:
+
+<Titleblock
+  fields={[
+    { label: 'Format', value: 'MDX' },
+    { label: 'Visibility', value: 'Dev only' },
+  ]}
+  status="draft"
+  class="my-8"
+/>
+
+## Why hairlines
+
+A one-pixel rule carries the same information as a box shadow and costs nothing
+in visual noise. On a drawing, rules divide; they do not decorate.
+
+The remaining note to work out: how the rules should behave at high pixel
+densities, where "one pixel" stops meaning one physical pixel.
