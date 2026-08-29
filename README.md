@@ -32,6 +32,8 @@ pnpm build      # static build to dist/ — drafts excluded
 pnpm preview    # serve the built output
 pnpm check      # astro check (TypeScript, strict)
 pnpm test       # vitest unit tests
+pnpm check:links # broken links/anchors in dist/ — needs a build first
+pnpm verify     # everything CI runs, in order
 ```
 
 Node 22, pnpm.
@@ -48,8 +50,12 @@ src/
   lib/           pure helpers: collections, reading-time, format-date, tags, schemas
   content.config.ts
 tests/unit/      vitest
+scripts/         check-links.mjs
 docs/
-public/fonts/    self-hosted woff2, latin subset
+public/
+  fonts/         self-hosted woff2, latin subset
+  _headers       Cloudflare Pages response headers
+.github/workflows/ci.yml
 ```
 
 The helpers in `src/lib/` are deliberately pure — they take entries and return
@@ -68,15 +74,25 @@ See [`docs/authoring.md`](docs/authoring.md) for the Obsidian workflow.
 
 ## Deployment
 
-Cloudflare Pages, production branch `main`, build command `pnpm build`, output
-`dist`, Node 22. Preview deploys on pull requests only — the free tier allows
-500 builds a month, and building every branch push burns it.
+Cloudflare Pages via Git integration, production branch `main`, build command
+`pnpm build`, output `dist`, Node 22. No GitHub secrets are involved — Pages
+authenticates through the Cloudflare GitHub App, and CI does not deploy.
+
+Preview builds are limited by branch control rather than by pull request;
+Cloudflare's Git integration cannot do PR-only previews. See
+[`docs/deployment.md`](docs/deployment.md) for the full setup runbook and
+[`docs/decisions.md`](docs/decisions.md) for why.
 
 ## Testing
+
+`pnpm verify` runs the full gate — the same four steps CI runs.
 
 105 unit tests cover schema validation, reading time, date formatting and the
 `updatedDate > pubDate` invariant, tag normalization, draft exclusion, and the
 content invariants (at most three featured projects, no duplicate slugs).
 
-The Playwright end-to-end suite, axe-core pass, link check and Lighthouse CI
-budgets described in the spec are not yet wired up.
+`pnpm check:links` checks the built `dist/` for broken internal links, broken
+fragments, and missing trailing slashes.
+
+The Playwright end-to-end suite, the axe-core pass and the Lighthouse CI
+budgets described in the spec are not yet wired up. Neither is a linter.

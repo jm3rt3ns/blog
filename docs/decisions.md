@@ -83,6 +83,59 @@ the grid is inset one pixel past the container and clipped so the outer
 borders do not double up. Any arrangement of spanning and non-spanning fields
 now renders correctly.
 
+### Preview deploys are branch-controlled, not per-pull-request
+
+**Spec §11** asks for two things that cannot both hold: "Cloudflare Pages,
+connected to the GitHub repo" with "Git integration", and "preview deploys on
+PRs only — not on every branch push."
+
+Cloudflare's Git integration builds on push and has no pull-request-scoped
+mode. Its only lever is branch control: which branch patterns are eligible for
+a preview build. So the choice was between the integration and the PR-only
+rule, and the integration won — it needs no API token, no secrets in GitHub,
+and no deploy logic in the repo.
+
+The §11 concern behind the PR-only rule was burning the 500-builds/month free
+tier on a chatty branch strategy. Branch control addresses that directly:
+restricting previews to a `preview/*` prefix means the `claude/*` branches
+never trigger a build. `docs/deployment.md` step 4 has the setting.
+
+If per-PR preview URLs become genuinely useful, the alternative is GitHub
+Actions running `wrangler pages deploy`, triggered on `pull_request` events.
+That gives exact control and moves builds off Cloudflare's quota entirely, at
+the cost of a `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in GitHub
+secrets. Not built.
+
+### CI runs four steps, not six
+
+**Spec §11** specifies `astro check` → lint → vitest → build → playwright →
+lighthouse-ci.
+
+The workflow runs `astro check`, vitest, build, and the §10 link check. The
+Playwright, axe-core and Lighthouse CI steps are absent because the suites they
+would run do not exist yet; a workflow step that runs nothing is worse than no
+step, because it reports green.
+
+There is also **no linter**. Adding one is a real decision — ESLint with the
+Astro and TypeScript plugins, or Prettier with `prettier-plugin-astro`, each
+pulling several dependencies that §3 asks to be justified. `astro check` already
+covers type correctness, which is the part that catches bugs. Formatting
+consistency is currently maintained by hand.
+
+### No Content-Security-Policy header
+
+`public/_headers` sets the standard security headers but no CSP. The site uses
+two small inline scripts — theme resolution in `<head>` and the toggle handler —
+and a CSP permitting `'unsafe-inline'` for scripts gives up most of what a CSP
+is for.
+
+The real fix is hash-based CSP. Astro 5 can generate one via
+`experimental.csp`, which hashes inline scripts and styles at build time.
+Enabling an experimental flag during a deployment task was more risk than it
+was worth, so this is deferred to phase 6, where it belongs with the rest of
+the hardening pass. Phase 4 will need `frame-src` and `script-src` entries for
+Giscus whenever it lands.
+
 ---
 
 ## Open questions
