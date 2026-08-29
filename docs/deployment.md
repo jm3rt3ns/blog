@@ -43,7 +43,11 @@ version in the lockfile rather than whatever is newest on the day of the build.
 
 ## Your checklist
 
-### 1. Rename `master` → `main`
+Steps 1 and 2 are complete — the rename is done and the scaffold is merged.
+They are kept below as a record of the order things happened in. Step 3 is
+where to pick up.
+
+### 1. Rename `master` → `main` — done
 
 GitHub → repo **Settings** → **General** → **Default branch** → the pencil icon
 → rename `master` to `main`.
@@ -59,12 +63,10 @@ git branch -m master main 2>/dev/null || true
 git branch -u origin/main main 2>/dev/null || true
 ```
 
-### 2. Merge the scaffold branch
+### 2. Merge the scaffold branch — done
 
-Open a PR from `claude/jackmertens-site-scaffold-40p7ua` into `main` and merge
-it. CI runs on the PR and should be green.
-
-Nothing deploys yet; the Worker does not exist.
+Merged via PRs #1 and #2. `main` now carries the site and `wrangler.jsonc`,
+which is what the Worker's first build needs to find.
 
 ### 3. Create the Worker
 

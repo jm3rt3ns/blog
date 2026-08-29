@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Jack Mertens">
+  <!--
+    A drawing sheet: ruled border, titleblock strip, revision stamp.
+    Colors are the site's own roles (§6.1).
+
+    The light palette is set with presentation attributes rather than CSS
+    variables, so a renderer that ignores the stylesheet still draws the icon
+    correctly instead of falling back to solid black. The stylesheet only
+    overrides for dark mode.
+  -->
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .ground { fill: #12161B; }
+      .rule { stroke: #E8E8E2; }
+      .stamp { fill: #E4705A; }
+    }
+  </style>
+  <rect class="ground rule" x="1.5" y="1.5" width="29" height="29"
+        fill="#EFEFE9" stroke="#171C22" stroke-width="2.5"/>
+  <line class="rule" x1="6" y1="10" x2="26" y2="10" stroke="#171C22" stroke-width="2"/>
+  <line class="rule" x1="6" y1="15.5" x2="19" y2="15.5" stroke="#171C22" stroke-width="2"/>
+  <line class="rule" x1="1.5" y1="21.5" x2="30.5" y2="21.5" stroke="#171C22" stroke-width="2.5"/>
+  <rect class="stamp" x="20.5" y="23.5" width="8" height="5" fill="#B4331F"/>
+</svg>

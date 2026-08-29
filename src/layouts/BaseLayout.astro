@@ -40,6 +40,11 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
     <meta name="theme-color" content="#EFEFE9" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#12161B" media="(prefers-color-scheme: dark)" />
 
+    {/* SVG first; the PNG is the fallback for browsers that will not take it. */}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
     {/* Display face only (§6.2) — everything else swaps in. */}
     <link
       rel="preload"
