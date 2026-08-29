@@ -1,6 +1,9 @@
-# Cloudflare Pages response headers.
+# Cloudflare response headers, applied to static asset responses.
 # Syntax: a path pattern, then indented `Header: value` lines.
-# https://developers.cloudflare.com/pages/configuration/headers/
+#
+# Astro copies public/ into dist/, which is the assets directory declared in
+# wrangler.jsonc. Cloudflare parses this file rather than serving it.
+# https://developers.cloudflare.com/workers/static-assets/headers/
 
 /*
   X-Content-Type-Options: nosniff
@@ -20,8 +23,8 @@
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
-# HTML is deliberately not given a Cache-Control rule here. Pages already
-# serves it as `public, max-age=0, must-revalidate`, and a pattern that
-# reliably matches directory URLs like /writing/ would also match the two
-# immutable prefixes above — leaving the winner up to Pages' merge order.
+# HTML is deliberately not given a Cache-Control rule here. Cloudflare already
+# serves static assets as `public, max-age=0, must-revalidate`, and a pattern
+# that reliably matches directory URLs like /writing/ would also match the two
+# immutable prefixes above — leaving the winner up to rule merge order.
 # docs/deployment.md has a curl to verify the default after the first deploy.

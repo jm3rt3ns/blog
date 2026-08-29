@@ -54,7 +54,8 @@ scripts/         check-links.mjs
 docs/
 public/
   fonts/         self-hosted woff2, latin subset
-  _headers       Cloudflare Pages response headers
+  _headers       Cloudflare response headers
+wrangler.jsonc   Cloudflare Workers static-assets config
 .github/workflows/ci.yml
 ```
 
@@ -74,14 +75,18 @@ See [`docs/authoring.md`](docs/authoring.md) for the Obsidian workflow.
 
 ## Deployment
 
-Cloudflare Pages via Git integration, production branch `main`, build command
-`pnpm build`, output `dist`, Node 22. No GitHub secrets are involved — Pages
-authenticates through the Cloudflare GitHub App, and CI does not deploy.
+Cloudflare Workers with static assets, connected to the GitHub repo.
+Production branch `main`, build command `pnpm build`, deploy command
+`npx wrangler deploy`, Node 22. No GitHub secrets are involved — Cloudflare
+authenticates through its GitHub App, and CI does not deploy.
 
-Preview builds are limited by branch control rather than by pull request;
-Cloudflare's Git integration cannot do PR-only previews. See
+`wrangler.jsonc` declares `dist/` as the asset directory, makes the edge
+enforce trailing slashes, and serves the custom `404.html`. Only `main` builds;
+there are no preview deployments.
+
+Spec §11 says Pages, which is now in maintenance mode. See
 [`docs/deployment.md`](docs/deployment.md) for the full setup runbook and
-[`docs/decisions.md`](docs/decisions.md) for why.
+[`docs/decisions.md`](docs/decisions.md) for why Workers instead.
 
 ## Testing
 

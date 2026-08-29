@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  // Cloudflare Workers with static assets (build spec §11).
+  //
+  // There is no `main` and no Worker script: this deploys `dist/` straight to
+  // the edge and lets Cloudflare handle routing, caching and 404s. Static
+  // asset requests are free and do not bill as Worker invocations.
+  //
+  // `name` must match the Workers project connected to this repo. Renaming it
+  // here deploys to a different Worker.
+  "name": "website",
+  "compatibility_date": "2026-08-08",
+
+  "assets": {
+    "directory": "./dist",
+
+    // The site is built with `trailingSlash: 'always'`, so the edge should
+    // enforce the same thing rather than serving /writing and /writing/ as two
+    // URLs. This 301s the unslashed form onto the canonical one.
+    "html_handling": "force-trailing-slash",
+
+    // Serve the custom dist/404.html for anything that does not resolve,
+    // instead of Cloudflare's default error page.
+    "not_found_handling": "404-page"
+  },
+
+  // Observability is free and off by default; without it there are no logs to
+  // look at when something misbehaves in production.
+  "observability": {
+    "enabled": true
+  }
+}
