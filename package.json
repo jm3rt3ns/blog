@@ -15,7 +15,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:links": "node scripts/check-links.mjs",
-    "verify": "pnpm check && pnpm test && pnpm build && pnpm check:links"
+    "verify": "pnpm check && pnpm test && pnpm build && pnpm check:links",
+    "deploy": "wrangler deploy",
+    "deploy:dry": "wrangler deploy --dry-run"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.6",
@@ -39,6 +41,7 @@
     "tailwindcss": "^4.1.14",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4",
+    "wrangler": "^4.127.1",
     "yaml": "^2.9.0",
     "zod": "^3.25.76"
   }
