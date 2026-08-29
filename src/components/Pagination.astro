@@ -1,0 +1,39 @@
+---
+import type { Page } from 'astro';
+
+interface Props {
+  page: Page<unknown>;
+}
+
+const { page } = Astro.props;
+const showPagination = page.lastPage > 1;
+---
+
+{
+  showPagination && (
+    <nav
+      aria-label="Pagination"
+      class="mt-14 pt-5 border-t border-rule flex items-baseline justify-between gap-6"
+    >
+      {page.url.prev ? (
+        <a href={page.url.prev} class="font-mono text-sm" rel="prev">
+          ← Newer
+        </a>
+      ) : (
+        <span aria-hidden="true" />
+      )}
+
+      <span class="field-label">
+        Sheet {page.currentPage} of {page.lastPage}
+      </span>
+
+      {page.url.next ? (
+        <a href={page.url.next} class="font-mono text-sm" rel="next">
+          Older →
+        </a>
+      ) : (
+        <span aria-hidden="true" />
+      )}
+    </nav>
+  )
+}

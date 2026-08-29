@@ -1,5 +1,45 @@
 {
-  "name": "blog",
+  "name": "jackmertens-com",
+  "type": "module",
+  "version": "0.1.0",
   "private": true,
-  "dependencies": {}
+  "packageManager": "pnpm@10.18.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check:links": "node scripts/check-links.mjs",
+    "verify": "pnpm check && pnpm test && pnpm build && pnpm check:links"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.6",
+    "@astrojs/react": "^4.4.0",
+    "astro": "^5.14.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.35.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@tailwindcss/vite": "^4.1.14",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.1",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "yaml": "^2.9.0",
+    "zod": "^3.25.76"
+  }
 }

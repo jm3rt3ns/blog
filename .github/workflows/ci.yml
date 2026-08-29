@@ -1,0 +1,52 @@
+name: CI
+
+# Cloudflare Pages builds and deploys the site itself through its Git
+# integration. This workflow is the quality gate in front of that — it does not
+# deploy anything.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push to a branch makes the previous run's answer irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Check, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      # --frozen-lockfile so a lockfile that drifted from package.json fails
+      # here rather than resolving to something different than Cloudflare will.
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm check
+
+      - name: Unit tests
+        run: pnpm test
+
+      # Builds with NODE_ENV=production, so draft posts are excluded — this is
+      # also the check that no draft leaks into a production build.
+      - name: Build
+        run: pnpm build
+
+      - name: Link check
+        run: pnpm check:links

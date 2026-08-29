@@ -1,0 +1,71 @@
+---
+/**
+ * Light/dark toggle (build spec §6.1, §9).
+ *
+ * The choice persists in a cookie rather than localStorage, so the resolution
+ * script in BaseLayout's <head> can apply it synchronously before first paint.
+ * With no cookie set the site follows `prefers-color-scheme` and this button
+ * simply writes whichever value is the opposite of what is currently rendered.
+ *
+ * Both glyphs ship in the markup and CSS picks one, so the button is correct
+ * on a static page with no hydration and no flash.
+ */
+---
+
+<button
+  type="button"
+  id="theme-toggle"
+  class="theme-toggle font-mono text-2xs uppercase tracking-[0.11em] text-graphite hover:text-ink border border-rule px-2 py-1 rounded-xs cursor-pointer"
+  aria-label="Toggle light or dark theme"
+>
+  <span class="when-light" aria-hidden="true">Dark</span>
+  <span class="when-dark" aria-hidden="true">Light</span>
+</button>
+
+<style>
+  /* Default (light): offer "Dark". */
+  .theme-toggle .when-dark {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .theme-toggle .when-light {
+      display: none;
+    }
+    :root:not([data-theme='light']) .theme-toggle .when-dark {
+      display: inline;
+    }
+  }
+
+  :root[data-theme='dark'] .theme-toggle .when-light {
+    display: none;
+  }
+  :root[data-theme='dark'] .theme-toggle .when-dark {
+    display: inline;
+  }
+
+  :root[data-theme='light'] .theme-toggle .when-light {
+    display: inline;
+  }
+  :root[data-theme='light'] .theme-toggle .when-dark {
+    display: none;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var button = document.getElementById('theme-toggle');
+    if (!button) return;
+
+    button.addEventListener('click', function () {
+      var explicit = document.documentElement.dataset.theme;
+      var current =
+        explicit ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      var next = current === 'dark' ? 'light' : 'dark';
+
+      document.documentElement.dataset.theme = next;
+      document.cookie = 'theme=' + next + ';path=/;max-age=31536000;samesite=lax';
+    });
+  })();
+</script>

@@ -1,24 +1,98 @@
-# README
+# jackmertens.com
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Personal site — long-form writing and a small set of project case studies.
+Static Astro build, deployed to Cloudflare Pages.
 
-Things you may want to cover:
+Built to the spec in [`docs/build-spec.md`](docs/build-spec.md). Where the
+implementation departs from it, the departure is recorded in
+[`docs/decisions.md`](docs/decisions.md).
 
-* Ruby version
+## Status
 
-* System dependencies
+Phases 1 and 2 of the six-phase plan are implemented:
 
-* Configuration
+| Phase | Scope | State |
+| --- | --- | --- |
+| 1 | Skeleton — collections, schemas, routes, one real post and project | done |
+| 2 | Design system — tokens, self-hosted fonts, titleblock, dark mode | done |
+| 3 | Discoverability — RSS, sitemap, OG images, JSON-LD | not started |
+| 4 | Comments — Giscus behind a swappable wrapper | not started |
+| 5 | Newsletter — Buttondown form, two placements | not started |
+| 6 | Polish — Pagefind, analytics, full Lighthouse pass | not started |
 
-* Database creation
+Nothing from phases 3–6 is stubbed. There is no dead form and no placeholder
+comment widget; the spec is explicit that those ship when they ship.
 
-* Database initialization
+## Commands
 
-* How to run the test suite
+```sh
+pnpm install
+pnpm dev        # dev server — draft posts are visible here
+pnpm build      # static build to dist/ — drafts excluded
+pnpm preview    # serve the built output
+pnpm check      # astro check (TypeScript, strict)
+pnpm test       # vitest unit tests
+pnpm check:links # broken links/anchors in dist/ — needs a build first
+pnpm verify     # everything CI runs, in order
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+Node 22, pnpm.
 
-* Deployment instructions
+## Structure
 
-* ...
+```
+src/
+  components/    Titleblock, PostCard, ProjectCard, Pagination, ThemeToggle
+  layouts/       BaseLayout, PostLayout, ProjectLayout
+  content/       posts/ and projects/ — markdown, the source of truth
+  pages/         routes
+  styles/        theme.css — every design token, in one @theme block
+  lib/           pure helpers: collections, reading-time, format-date, tags, schemas
+  content.config.ts
+tests/unit/      vitest
+scripts/         check-links.mjs
+docs/
+public/
+  fonts/         self-hosted woff2, latin subset
+  _headers       Cloudflare Pages response headers
+.github/workflows/ci.yml
+```
+
+The helpers in `src/lib/` are deliberately pure — they take entries and return
+entries, and never call `getCollection` themselves. That keeps every ordering
+and visibility rule unit-testable, and keeps them free of anything that
+assumes a build-time-only environment, so the SSR upgrade path stays open.
+
+## Content
+
+Posts and projects are markdown files validated by zod at build time. A
+malformed frontmatter field fails the build rather than degrading silently.
+
+`draft: true` posts render in `pnpm dev` and are excluded from `pnpm build`.
+
+See [`docs/authoring.md`](docs/authoring.md) for the Obsidian workflow.
+
+## Deployment
+
+Cloudflare Pages via Git integration, production branch `main`, build command
+`pnpm build`, output `dist`, Node 22. No GitHub secrets are involved — Pages
+authenticates through the Cloudflare GitHub App, and CI does not deploy.
+
+Preview builds are limited by branch control rather than by pull request;
+Cloudflare's Git integration cannot do PR-only previews. See
+[`docs/deployment.md`](docs/deployment.md) for the full setup runbook and
+[`docs/decisions.md`](docs/decisions.md) for why.
+
+## Testing
+
+`pnpm verify` runs the full gate — the same four steps CI runs.
+
+105 unit tests cover schema validation, reading time, date formatting and the
+`updatedDate > pubDate` invariant, tag normalization, draft exclusion, and the
+content invariants (at most three featured projects, no duplicate slugs).
+
+`pnpm check:links` checks the built `dist/` for broken internal links, broken
+fragments, and missing trailing slashes.
+
+The Playwright end-to-end suite, the axe-core pass and the Lighthouse CI
+budgets described in the spec are not yet wired up. Neither is a linter.

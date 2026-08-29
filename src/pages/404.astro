@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Titleblock from '../components/Titleblock.astro';
+
+const fields = [
+  { label: 'Status', value: '404' },
+  { label: 'Meaning', value: 'No sheet at this reference' },
+];
+---
+
+<BaseLayout
+  title="Not found"
+  description="That page doesn't exist. Links to the writing archive and the project index are below."
+>
+  <h1 class="text-2xl">Not found</h1>
+  <p class="mt-3 text-graphite">
+    There's nothing at this address. It may have moved, or it may never have existed.
+  </p>
+
+  <Titleblock fields={fields} status="void" class="mt-8" />
+
+  <ul class="mt-10 list-none p-0 border-t border-rule">
+    <li class="border-b border-rule py-3">
+      <a href="/writing/">Writing</a> — everything I've published, newest first.
+    </li>
+    <li class="border-b border-rule py-3">
+      <a href="/work/">Work</a> — the project index.
+    </li>
+    <li class="border-b border-rule py-3">
+      <a href="/">Home</a>
+    </li>
+  </ul>
+</BaseLayout>

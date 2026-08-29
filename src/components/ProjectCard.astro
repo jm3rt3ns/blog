@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../lib/collections';
+import { formatDateRange } from '../lib/format-date';
+
+interface Props {
+  project: Project;
+  headingLevel?: 2 | 3;
+  /** The home page's first card is the LCP candidate (§9). */
+  eager?: boolean;
+}
+
+const { project, headingLevel = 2, eager = false } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+const href = `/work/${project.id}/`;
+const { cover, title, client, summary, status, startDate, endDate } = project.data;
+---
+
+<article class="group">
+  <a href={href} class="block no-underline">
+    <Image
+      src={cover}
+      alt=""
+      widths={[400, 800, 1200]}
+      sizes="(min-width: 768px) 33vw, 100vw"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : 'auto'}
+      decoding={eager ? 'sync' : 'async'}
+      class="w-full border border-rule rounded-xs"
+    />
+  </a>
+
+  <div class="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+    <span class="field-label">{formatDateRange(startDate, endDate)}</span>
+    <span class="field-label text-mark">{status}</span>
+  </div>
+
+  <Heading class="mt-2 text-lg">
+    <a href={href} class="text-ink no-underline group-hover:text-signal">{title}</a>
+  </Heading>
+
+  {client && <p class="mt-1 field-label">{client}</p>}
+
+  <p class="mt-2 text-graphite">{summary}</p>
+</article>
