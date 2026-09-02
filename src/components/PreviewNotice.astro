@@ -1,0 +1,32 @@
+---
+/**
+ * Site-wide preview notice.
+ *
+ * Drawn above the masthead on every page, as the drawing-stamp equivalent of
+ * a "NOT FOR CONSTRUCTION" plot: a mark-colored stamp on a hairline-ruled
+ * band, so it reads as an annotation on the sheet rather than a UI chrome
+ * element pasted over it.
+ *
+ * The band is a landmark rather than an alert — the content is static and
+ * present at first paint, so `role="alert"` would be wrong.
+ */
+---
+
+<aside
+  aria-label="Site status"
+  class="border-b border-rule bg-[color-mix(in_srgb,var(--color-mark)_9%,var(--color-vellum))]"
+>
+  <div
+    class="mx-auto max-w-page w-full px-5 sm:px-8 py-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1.5"
+  >
+    <span
+      class="inline-flex items-center border border-mark text-mark rounded-xs px-2 py-0.5 font-mono text-2xs font-medium uppercase tracking-[0.16em]"
+    >
+      Preview
+    </span>
+    <p class="font-mono text-2xs leading-relaxed tracking-[0.02em] text-graphite">
+      This site is under construction. All content is AI-generated placeholder
+      material — it does not reflect real work I have done or opinions I hold.
+    </p>
+  </div>
+</aside>

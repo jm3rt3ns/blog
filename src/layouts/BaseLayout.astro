@@ -1,6 +1,7 @@
 ---
 import '../styles/theme.css';
 import ThemeToggle from '../components/ThemeToggle.astro';
+import PreviewNotice from '../components/PreviewNotice.astro';
 
 interface Props {
   title: string;
@@ -80,6 +81,8 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
     >
       Skip to content
     </a>
+
+    <PreviewNotice />
 
     <header class="border-b border-rule">
       <div
